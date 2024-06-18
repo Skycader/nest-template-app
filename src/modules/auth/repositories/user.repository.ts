@@ -22,30 +22,12 @@ export class UserRepository extends Repository<UserEntity> {
     throw new NotFoundException(404);
   }
 
-  errorHandler(error: any) {
-    switch (error.code) {
-      case "23505":
-        // throw new ConflictException('Username already exists');
-        console.log("user exists");
-      default:
-        // throw new InternalServerErrorException();
-        console.log("some other error");
-    }
-  }
-
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { username, password } = authCredentialsDto;
 
     const salt = await bcrypt.genSalt();
     const user = new UserEntity();
     user.username = username.toLowerCase();
-    user.role = "client";
-    user.telephone = "";
-    user.name = "";
-    user.midname = "";
-    user.surname = "";
-    user.information = "";
-    user.birthdate = 0;
     user.salt = salt;
     user.password = await this.hashPassword(password, salt);
     try {
@@ -132,5 +114,16 @@ export class UserRepository extends Repository<UserEntity> {
     user.information = profile.information?.slice(0, 5000);
 
     await user.save();
+  }
+
+  public errorHandler(error: any) {
+    switch (error.code) {
+      case "23505":
+        // throw new ConflictException('Username already exists');
+        console.log("user exists");
+      default:
+        // throw new InternalServerErrorException();
+        console.log("some other error");
+    }
   }
 }
