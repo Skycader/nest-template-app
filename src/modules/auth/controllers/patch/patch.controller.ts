@@ -5,9 +5,13 @@ import { IsModeratorGuard } from "../../guards/is-moderator.guard";
 import { UserEntity } from "../../entities/user.entity";
 import { GetUser } from "../../decorators/get-user.decorator";
 
-@Controller("auth.patch")
+/** @TODO
+ * Remove fucking anys
+ *
+ */
+@Controller("auth")
 export class AuthPatchController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Patch("/edit-profile")
   @UseGuards(AuthGuard())

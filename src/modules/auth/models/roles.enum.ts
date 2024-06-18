@@ -1,4 +1,4 @@
-export enum RolesEnum {
+export enum UserRolesEnum {
   guest = 0,
   user = 1,
   moderator = 2,

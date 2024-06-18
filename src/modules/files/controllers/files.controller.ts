@@ -25,6 +25,7 @@ import { secret } from "src/config/jwt.config";
 import { GetUser } from "src/modules/auth/decorators/get-user.decorator";
 import { UserEntity } from "src/modules/auth/entities/user.entity";
 import { IsModeratorGuard } from "src/modules/auth/guards/is-moderator.guard";
+import { UserRolesEnum } from "src/modules/auth/models/roles.enum";
 @Controller("files")
 export class FilesController {
   @Post("upload")
@@ -36,7 +37,7 @@ export class FilesController {
     file: /* new ParseFilePipe({
          validators: [new MaxFileSizeValidator({ maxSize: 2000000 })],
        }), */
-      Express.Multer.File
+    Express.Multer.File
   ) {
     if (file.originalname.includes(":"))
       throw new BadRequestException("File cannot have : inside its name.");
@@ -94,7 +95,7 @@ export class FilesController {
     file: /* new ParseFilePipe({
          validators: [new MaxFileSizeValidator({ maxSize: 2000000 })],
        }), */
-      Express.Multer.File
+    Express.Multer.File
   ) {
     if (file.originalname.includes(":"))
       throw new BadRequestException("File cannot have : inside its name.");
@@ -156,7 +157,7 @@ export class FilesController {
     @Param("username") username: string,
     @Param("filename") filename: string
   ) {
-    if (user.role !== "moderator" && user.username !== username) {
+    if (user.role !== UserRolesEnum.moderator && user.username !== username) {
       throw new BadRequestException("UnauthorizedException");
     }
     let obj = {

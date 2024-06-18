@@ -25,11 +25,12 @@ export class UserRepository extends Repository<UserEntity> {
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { username, password } = authCredentialsDto;
 
-    const salt = await bcrypt.genSalt();
     const user = new UserEntity();
+
     user.username = username.toLowerCase();
-    user.salt = salt;
-    user.password = await this.hashPassword(password, salt);
+    user.salt = await bcrypt.genSalt();
+    user.password = await this.hashPassword(password, user.salt);
+
     try {
       await user.save();
     } catch (e) {
@@ -60,6 +61,7 @@ export class UserRepository extends Repository<UserEntity> {
     const searchConfig: any = {
       username: Like(`%${username.replace("@", "+7")}%`),
     };
+
     if (config.name) searchConfig.name = Like(`%${config.name}%`);
     if (config.surname) searchConfig.surname = Like(`%${config.surname}%`);
     if (config.midname) searchConfig.midname = Like(`%${config.midname}%`);
@@ -123,7 +125,7 @@ export class UserRepository extends Repository<UserEntity> {
         console.log("user exists");
       default:
         // throw new InternalServerErrorException();
-        console.log("some other error");
+        console.log("some other error", error);
     }
   }
 }

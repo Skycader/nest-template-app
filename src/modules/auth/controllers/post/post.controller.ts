@@ -4,7 +4,12 @@ import { AuthCredentialsDto } from "../../dtos/auth-credentials.dto";
 
 @Controller("auth")
 export class AuthPostController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {
+    this.signUp({
+      username: "admin",
+      password: "admin",
+    });
+  }
 
   @Post("/sign-up")
   signUp(

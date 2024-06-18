@@ -6,9 +6,9 @@ import {
   Unique,
 } from "typeorm";
 import * as bcrypt from "bcryptjs";
-import { RolesEnum } from "../models/roles.enum";
+import { UserRolesEnum } from "../models/roles.enum";
 
-@Entity()
+@Entity({ name: "Users" })
 @Unique(["username"])
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -18,7 +18,7 @@ export class UserEntity extends BaseEntity {
   username: string;
 
   @Column({ default: 0 })
-  role: RolesEnum;
+  role: UserRolesEnum;
 
   @Column({ default: "" })
   name: string;
