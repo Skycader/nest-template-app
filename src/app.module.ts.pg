@@ -1,0 +1,26 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { dataSourceOptions, typeOrmConfig } from './config/typeorm.config';
+import { AuthModule } from './modules/auth/auth.module';
+import { FilesModule } from './modules/files/files.module';
+import { CaptchaModule } from './modules/captcha/captcha.module';
+import { EmailModule } from './modules/email/email.module';
+import { CaseModule } from './modules/case/case.module';
+import { RoleModule } from './modules/role/role.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot(dataSourceOptions),
+    FilesModule,
+    AuthModule,
+    CaptchaModule,
+    EmailModule,
+    CaseModule,
+    RoleModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}

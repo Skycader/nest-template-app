@@ -1,0 +1,22 @@
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+
+export const typeOrmConfig: TypeOrmModuleOptions = {
+  type: 'sqlite',
+  database: './database/db.sql',
+  entities: [__dirname + '/../**/*.entity.{js,ts}'],
+  // entities: ['src/entity/*.ts', './build/src/entity/*.js'], // <- Here!
+  // entities: [Todo],
+  synchronize: true,
+};
+
+export const dataSourceOptions: DataSourceOptions = {
+  type: 'sqlite',
+  database: './db/db.sql',
+  entities: [__dirname + '/../**/*.entity.{js,ts}'],
+  // entities: ['src/entity/*.ts', './build/src/entity/*.js'], // <- Here!
+  // entities: [Todo],
+  migrations: ['dist/migrations/*.js'],
+};
+
+export const dataSource = new DataSource(dataSourceOptions);

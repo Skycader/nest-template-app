@@ -1,0 +1,32 @@
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+
+export const typeOrmConfig: TypeOrmModuleOptions = {
+  type: 'postgres',
+  host: '172.17.0.2',
+  port: 5432,
+  username: 'postgres',
+  password: 'postgres',
+  database: 'nest-app',
+  entities: [__dirname + '/../**/*.entity.{js,ts}'],
+  // entities: ['src/entity/*.ts', './build/src/entity/*.js'], // <- Here!
+  // entities: [Todo],
+  synchronize: false,
+  migrationsTableName: 'user',
+  migrations: ['migrations/*.js'],
+};
+
+export const dataSourceOptions: DataSourceOptions = {
+  type: 'postgres',
+  host: '172.17.0.2',
+  port: 5432,
+  username: 'postgres',
+  password: 'postgres',
+  database: 'nest-app',
+  entities: [__dirname + '/../**/*.entity.{js,ts}'],
+  // entities: ['src/entity/*.ts', './build/src/entity/*.js'], // <- Here!
+  // entities: [Todo],
+  migrations: ['dist/migrations/*.js'],
+};
+
+export const dataSource = new DataSource(dataSourceOptions);
