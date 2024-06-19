@@ -15,6 +15,7 @@ import { UserRolesEnum } from "../models/roles.enum";
 import { UserEnum } from "../models/user.enum";
 import { UserInterface } from "../models/user.model";
 import { UserDto } from "../dtos/user.dto";
+import { PublicUserFields } from "../models/user.fields";
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
   constructor(
@@ -88,17 +89,7 @@ export class UserRepository extends Repository<UserEntity> {
     });
 
     const users = await this.find({
-      select: [
-        UserEnum.id,
-        UserEnum.username,
-        UserEnum.role,
-        UserEnum.name,
-        UserEnum.midname,
-        UserEnum.surname,
-        UserEnum.birthdate,
-        UserEnum.telephone,
-        UserEnum.information,
-      ],
+      select: PublicUserFields,
       where: [searchConfig],
       take: 10,
       skip: page * 10 - 10,
@@ -112,19 +103,21 @@ export class UserRepository extends Repository<UserEntity> {
 
   async editProfile(username: string, profile: UserDto) {
     let user = await this.findOne({
+      select: PublicUserFields,
       where: { username: username },
     });
 
-    user.name = profile.name ? profile.name : user.name;
-    user.midname = profile.midname ? profile.midname : user.midname;
-    user.surname = profile.surname ? profile.surname : user.surname;
-    user.birthdate = profile.birthdate ? profile.birthdate : user.birthdate;
-    user.telephone = profile.telephone ? profile.telephone : user.telephone;
-    user.information = profile.information
+    user.name = profile?.name ? profile.name : user.name;
+    user.midname = profile?.midname ? profile.midname : user.midname;
+    user.surname = profile?.surname ? profile.surname : user.surname;
+    user.birthdate = profile?.birthdate ? profile.birthdate : user.birthdate;
+    user.telephone = profile?.telephone ? profile.telephone : user.telephone;
+    user.information = profile?.information
       ? profile.information
       : user.information;
 
     await user.save();
+    return user;
   }
 
   public errorHandler(error: QueryErrorInterface) {

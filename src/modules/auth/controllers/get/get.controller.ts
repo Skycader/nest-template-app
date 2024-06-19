@@ -13,7 +13,7 @@ export class AuthGetController {
   @Get("current-user")
   @UseGuards(AuthGuard())
   public getUser(@GetUser() user: UserEntity) {
-    return user;
+    return this.authService.getUser(user.username);
   }
 
   @Get("/users")

@@ -1,4 +1,11 @@
-import { Body, Controller, Param, Patch, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Param,
+  Patch,
+  UseGuards,
+  ValidationPipe,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "../../services/auth.service";
 import { IsModeratorGuard } from "../../guards/is-moderator.guard";
@@ -19,8 +26,9 @@ export class AuthPatchController {
   editProfile(
     @GetUser() user: UserEntity,
     @Param("username") username: string,
-    @Body("profileData") userDto: UserDto
+    @Body(ValidationPipe) userDto: UserDto
   ) {
+    console.log("userDto: ", userDto);
     return user.role > 1
       ? this.authService.editProfile(username, userDto)
       : this.authService.editProfile(user.username, userDto);
