@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as bcrypt from "bcryptjs";
-import { Like, Repository, TypeORMError } from "typeorm";
+import { FindOptionsWhere, Like, Repository, TypeORMError } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
 import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
 import { UserSearchConfigInterface } from "../models/user-search.config";
@@ -72,21 +72,20 @@ export class UserRepository extends Repository<UserEntity> {
 
   async searchUsers(config: UserSearchConfigInterface = {}) {
     const page = config.page ? config.page : 1;
-    const searchConfig: UserSearchConfigInterface = { username: Like("%%") };
+    const searchConfig: FindOptionsWhere<UserEntity> = { username: Like("%%") };
 
     if (config.username) searchConfig.username = Like(`%${config.username}%`);
+    if (config.role) searchConfig.role = config.role;
     if (config.name) searchConfig.name = Like(`%${config.name}%`);
     if (config.surname) searchConfig.surname = Like(`%${config.surname}%`);
     if (config.midname) searchConfig.midname = Like(`%${config.midname}%`);
     if (config.telephone) searchConfig.username = Like(`%${config.telephone}%`);
 
-    console.log(searchConfig);
-
-    let count = await this.count({
+    let pages = await this.count({
       where: [searchConfig],
     });
 
-    let res = await this.find({
+    const users = await this.find({
       select: [
         UserEnum.id,
         UserEnum.username,
@@ -104,8 +103,8 @@ export class UserRepository extends Repository<UserEntity> {
     });
 
     return {
-      users: res,
-      pages: count,
+      users,
+      pages,
     };
   }
 

@@ -18,7 +18,7 @@ export class UserEntity extends BaseEntity implements UserInterface {
   @Column({ unique: true })
   username: string;
 
-  @Column({ default: 0 })
+  @Column({ default: 1 })
   role: UserRolesEnum;
 
   @Column({ default: "" })
