@@ -6,6 +6,7 @@ import { JwtPayloadInterface } from "../models/jwt-payload.model";
 import { UserSearchConfigInterface } from "../models/user-search.config";
 import { UserInterface } from "../models/user.model";
 import { Observable, of } from "rxjs";
+import { UserDto } from "../dtos/user.dto";
 
 @Injectable()
 export class AuthService {
@@ -56,14 +57,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  async editProfile(username: string, profileDataDto: UserInterface) {
-    return this.userRepository.editProfile(username, profileDataDto);
-  }
-
-  async editProfileByModerator(
-    username: string,
-    profileDataDto: UserInterface
-  ) {
-    return this.userRepository.editProfileByModerator(username, profileDataDto);
+  async editProfile(username: string, userDto: UserDto) {
+    return this.userRepository.editProfile(username, userDto);
   }
 }

@@ -13,6 +13,8 @@ import { UserSearchConfigInterface } from "../models/user-search.config";
 import { QueryErrorInterface } from "../models/query-fail.model";
 import { UserRolesEnum } from "../models/roles.enum";
 import { UserEnum } from "../models/user.enum";
+import { UserInterface } from "../models/user.model";
+import { UserDto } from "../dtos/user.dto";
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
   constructor(
@@ -108,34 +110,19 @@ export class UserRepository extends Repository<UserEntity> {
     };
   }
 
-  async editProfile(username: string, profileDataDto: any) {
+  async editProfile(username: string, profile: UserDto) {
     let user = await this.findOne({
       where: { username: username },
     });
 
-    console.log(profileDataDto);
-    const profile = profileDataDto;
-    user.name = profile.firstname?.slice(0, 500);
-    user.midname = profile.midname?.slice(0, 500);
-    user.surname = profile.surname?.slice(0, 500);
-    user.birthdate = profile.birthday?.slice(0, 500); /*unix*/
-    user.telephone = profile.telephone?.slice(0, 500);
-    user.information = profile.information?.slice(0, 5000);
-    await user.save();
-  }
-
-  async editProfileByModerator(username: string, profileDataDto: any) {
-    let user = await this.findOne({
-      where: { username: username },
-    });
-
-    const profile = profileDataDto;
-    user.name = profile.firstname?.slice(0, 500);
-    user.midname = profile.midname?.slice(0, 500);
-    user.surname = profile.surname?.slice(0, 500);
-    user.birthdate = profile.birthday?.slice(0, 500);
-    user.telephone = profile.telephone?.slice(0, 500);
-    user.information = profile.information?.slice(0, 5000);
+    user.name = profile.name ? profile.name : user.name;
+    user.midname = profile.midname ? profile.midname : user.midname;
+    user.surname = profile.surname ? profile.surname : user.surname;
+    user.birthdate = profile.birthdate ? profile.birthdate : user.birthdate;
+    user.telephone = profile.telephone ? profile.telephone : user.telephone;
+    user.information = profile.information
+      ? profile.information
+      : user.information;
 
     await user.save();
   }

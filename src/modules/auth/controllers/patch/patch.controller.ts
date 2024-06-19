@@ -4,6 +4,7 @@ import { AuthService } from "../../services/auth.service";
 import { IsModeratorGuard } from "../../guards/is-moderator.guard";
 import { UserEntity } from "../../entities/user.entity";
 import { GetUser } from "../../decorators/get-user.decorator";
+import { UserDto } from "../../dtos/user.dto";
 
 /** @TODO
  * Remove fucking anys
@@ -11,23 +12,17 @@ import { GetUser } from "../../decorators/get-user.decorator";
  */
 @Controller("auth")
 export class AuthPatchController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
-  @Patch("/edit-profile")
+  @Patch("/edit-profile/:username")
   @UseGuards(AuthGuard())
   editProfile(
     @GetUser() user: UserEntity,
-    @Body("profileData") profileDataDto: any
-  ) {
-    return this.authService.editProfile(user.username, profileDataDto);
-  }
-
-  @Patch("/edit-profile-by-moderator/:username")
-  @UseGuards(AuthGuard(), IsModeratorGuard)
-  editProfileByModerator(
     @Param("username") username: string,
-    @Body("profileData") profileDataDto: any
+    @Body("profileData") userDto: UserDto
   ) {
-    return this.authService.editProfileByModerator(username, profileDataDto);
+    return user.role > 1
+      ? this.authService.editProfile(username, userDto)
+      : this.authService.editProfile(user.username, userDto);
   }
 }
