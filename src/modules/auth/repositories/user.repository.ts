@@ -1,10 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as bcrypt from "bcryptjs";
-import { Like, Repository } from "typeorm";
+import { Like, Repository, TypeORMError } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
 import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
 import { UserSearchConfigInterface } from "../models/user-search.config";
+import { QueryErrorInterface } from "../models/query-fail.model";
+import { UserRolesEnum } from "../models/roles.enum";
+import { UserEnum } from "../models/user.enum";
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
   constructor(
@@ -31,6 +39,8 @@ export class UserRepository extends Repository<UserEntity> {
     user.username = username.toLowerCase();
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
+
+    if (user.username === "admin") user.role = UserRolesEnum.administrator;
 
     try {
       await user.save();
@@ -60,25 +70,34 @@ export class UserRepository extends Repository<UserEntity> {
     return await bcrypt.hash(password, salt);
   }
 
-  async findUser(
-    username: string = "",
-    page: number = 1,
-    config: UserSearchConfigInterface = {}
-  ) {
-    const searchConfig: UserSearchConfigInterface = {
-      username: Like(`%${config.username}%`),
-    };
+  async searchUsers(config: UserSearchConfigInterface = {}) {
+    const page = config.page ? config.page : 1;
+    const searchConfig: UserSearchConfigInterface = { username: Like("%%") };
 
+    if (config.username) searchConfig.username = Like(`%${config.username}%`);
     if (config.name) searchConfig.name = Like(`%${config.name}%`);
     if (config.surname) searchConfig.surname = Like(`%${config.surname}%`);
     if (config.midname) searchConfig.midname = Like(`%${config.midname}%`);
     if (config.telephone) searchConfig.username = Like(`%${config.telephone}%`);
+
+    console.log(searchConfig);
 
     let count = await this.count({
       where: [searchConfig],
     });
 
     let res = await this.find({
+      select: [
+        UserEnum.id,
+        UserEnum.username,
+        UserEnum.role,
+        UserEnum.name,
+        UserEnum.midname,
+        UserEnum.surname,
+        UserEnum.birthdate,
+        UserEnum.telephone,
+        UserEnum.information,
+      ],
       where: [searchConfig],
       take: 10,
       skip: page * 10 - 10,
@@ -86,7 +105,7 @@ export class UserRepository extends Repository<UserEntity> {
 
     return {
       users: res,
-      length: count,
+      pages: count,
     };
   }
 
@@ -115,21 +134,19 @@ export class UserRepository extends Repository<UserEntity> {
     user.name = profile.firstname?.slice(0, 500);
     user.midname = profile.midname?.slice(0, 500);
     user.surname = profile.surname?.slice(0, 500);
-    user.birthdate = profile.birthday?.slice(0, 500); /*unix*/
+    user.birthdate = profile.birthday?.slice(0, 500);
     user.telephone = profile.telephone?.slice(0, 500);
     user.information = profile.information?.slice(0, 5000);
 
     await user.save();
   }
 
-  public errorHandler(error: any) {
+  public errorHandler(error: QueryErrorInterface) {
     switch (error.code) {
-      case "23505":
-        // throw new ConflictException('Username already exists');
-        console.log("user exists");
+      case 23505:
+      // throw new ConflictException("Username already exists");
       default:
-        // throw new InternalServerErrorException();
-        console.log("some other error", error);
+      // throw new InternalServerErrorException();
     }
   }
 }

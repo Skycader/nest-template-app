@@ -16,14 +16,9 @@ export class AuthGetController {
     return user;
   }
 
-  @Get("/user/:username/:page")
+  @Get("/users")
   @UseGuards(AuthGuard(), IsModeratorGuard)
-  findUser(
-    @Query() query: UserSearchConfigInterface,
-    @Param("username") username: string,
-    @Param("page") page: number
-  ) {
-    console.log(query);
-    return this.authService.findUser(username, page, query);
+  findUser(@Query() query: UserSearchConfigInterface) {
+    return this.authService.searchUsers(query);
   }
 }

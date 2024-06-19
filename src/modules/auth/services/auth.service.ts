@@ -12,10 +12,12 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private readonly userRepository: UserRepository
-  ) { }
+  ) {
+    this.initAuthTable();
+  }
 
   async initAuthTable() {
-    let admin = await this.findUser("admin");
+    let admin = await this.getUser("admin");
 
     if (admin) return of(0);
 
@@ -31,12 +33,12 @@ export class AuthService {
     return this.userRepository.signUp(authCredentialsDto);
   }
 
-  async findUser(
-    username: string = "",
-    page: number = 1,
-    config: UserSearchConfigInterface = {}
-  ) {
-    return this.userRepository.findUser(username, page, config);
+  async searchUsers(config: UserSearchConfigInterface = {}) {
+    return this.userRepository.searchUsers(config);
+  }
+
+  async getUser(username: string = "") {
+    return this.userRepository.getUser(username);
   }
 
   async signInWithPassword(

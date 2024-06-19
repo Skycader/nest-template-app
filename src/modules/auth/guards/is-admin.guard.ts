@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Observable } from "rxjs";
+import { UserRolesEnum } from "../models/roles.enum";
 
 @Injectable()
 export class IsAdminGuard implements CanActivate {
@@ -7,6 +8,6 @@ export class IsAdminGuard implements CanActivate {
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    return request.user.username === "skycader@yandex.ru";
+    return request.user.role >= UserRolesEnum.administrator;
   }
 }

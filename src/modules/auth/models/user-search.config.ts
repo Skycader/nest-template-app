@@ -2,6 +2,7 @@ import { FindOperator } from "typeorm";
 import { UserRolesEnum } from "./roles.enum";
 
 export interface UserSearchConfigInterface {
+  page?: number;
   id?: number | FindOperator<number>;
   username?: string | FindOperator<string>;
   role?: UserRolesEnum | FindOperator<UserRolesEnum>;
