@@ -3,6 +3,9 @@ import { JwtService } from "@nestjs/jwt";
 import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
 import { UserRepository } from "../repositories/user.repository";
 import { JwtPayloadInterface } from "../models/jwt-payload.model";
+import { UserSearchConfigInterface } from "../models/user-search.config";
+import { UserInterface } from "../models/user.model";
+import { Observable, of } from "rxjs";
 
 @Injectable()
 export class AuthService {
@@ -11,33 +14,29 @@ export class AuthService {
     private readonly userRepository: UserRepository
   ) { }
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async initAuthTable() {
+    let admin = await this.findUser("admin");
+
+    if (admin) return of(0);
+
+    this.signUp({
+      username: "admin",
+      password: "admin",
+    });
+
+    return of(1);
+  }
+
+  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<number> {
     return this.userRepository.signUp(authCredentialsDto);
   }
 
-  async findUser(username: string, page: number, config: any = {}) {
+  async findUser(
+    username: string = "",
+    page: number = 1,
+    config: UserSearchConfigInterface = {}
+  ) {
     return this.userRepository.findUser(username, page, config);
-  }
-
-  async signIn(authCredentialsDto: any) {
-    if (!authCredentialsDto.username) {
-      throw new UnauthorizedException("Invalid credentials");
-    }
-
-    let user = await this.findUser(authCredentialsDto.username, 1);
-    if (!user[0]) {
-      let usr = {
-        username: authCredentialsDto.username,
-        password: "hardpassword",
-      };
-      this.signUp(usr);
-    }
-
-    let obj = { username: authCredentialsDto.username };
-
-    const payload: JwtPayloadInterface = obj;
-    const accessToken = await this.jwtService.signAsync(payload);
-    return { accessToken };
   }
 
   async signInWithPassword(
@@ -55,11 +54,14 @@ export class AuthService {
     return { accessToken };
   }
 
-  async editProfile(username: string, profileDataDto: any) {
+  async editProfile(username: string, profileDataDto: UserInterface) {
     return this.userRepository.editProfile(username, profileDataDto);
   }
 
-  async editProfileByModerator(username: string, profileDataDto: any) {
+  async editProfileByModerator(
+    username: string,
+    profileDataDto: UserInterface
+  ) {
     return this.userRepository.editProfileByModerator(username, profileDataDto);
   }
 }

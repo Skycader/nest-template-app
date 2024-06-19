@@ -4,6 +4,7 @@ import * as bcrypt from "bcryptjs";
 import { Like, Repository } from "typeorm";
 import { UserEntity } from "../entities/user.entity";
 import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
+import { UserSearchConfigInterface } from "../models/user-search.config";
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
   constructor(
@@ -22,7 +23,7 @@ export class UserRepository extends Repository<UserEntity> {
     throw new NotFoundException(404);
   }
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<number> {
     const { username, password } = authCredentialsDto;
 
     const user = new UserEntity();
@@ -33,8 +34,10 @@ export class UserRepository extends Repository<UserEntity> {
 
     try {
       await user.save();
+      return 0;
     } catch (e) {
       this.errorHandler(e);
+      return 1;
     }
   }
 
@@ -57,9 +60,13 @@ export class UserRepository extends Repository<UserEntity> {
     return await bcrypt.hash(password, salt);
   }
 
-  async findUser(username: string = "", page: number = 1, config: any = {}) {
-    const searchConfig: any = {
-      username: Like(`%${username.replace("@", "+7")}%`),
+  async findUser(
+    username: string = "",
+    page: number = 1,
+    config: UserSearchConfigInterface = {}
+  ) {
+    const searchConfig: UserSearchConfigInterface = {
+      username: Like(`%${config.username}%`),
     };
 
     if (config.name) searchConfig.name = Like(`%${config.name}%`);
@@ -67,7 +74,6 @@ export class UserRepository extends Repository<UserEntity> {
     if (config.midname) searchConfig.midname = Like(`%${config.midname}%`);
     if (config.telephone) searchConfig.username = Like(`%${config.telephone}%`);
 
-    console.log("CONFIG", searchConfig);
     let count = await this.count({
       where: [searchConfig],
     });
@@ -77,8 +83,6 @@ export class UserRepository extends Repository<UserEntity> {
       take: 10,
       skip: page * 10 - 10,
     });
-
-    console.log(res);
 
     return {
       users: res,

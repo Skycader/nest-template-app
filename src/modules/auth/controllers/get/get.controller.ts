@@ -4,10 +4,11 @@ import { AuthService } from "../../services/auth.service";
 import { IsModeratorGuard } from "../../guards/is-moderator.guard";
 import { GetUser } from "../../decorators/get-user.decorator";
 import { UserEntity } from "../../entities/user.entity";
+import { UserSearchConfigInterface } from "../../models/user-search.config";
 
 @Controller("auth")
 export class AuthGetController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Get("current-user")
   @UseGuards(AuthGuard())
@@ -18,7 +19,7 @@ export class AuthGetController {
   @Get("/user/:username/:page")
   @UseGuards(AuthGuard(), IsModeratorGuard)
   findUser(
-    @Query() query: string,
+    @Query() query: UserSearchConfigInterface,
     @Param("username") username: string,
     @Param("page") page: number
   ) {

@@ -7,10 +7,11 @@ import {
 } from "typeorm";
 import * as bcrypt from "bcryptjs";
 import { UserRolesEnum } from "../models/roles.enum";
+import { UserInterface } from "../models/user.model";
 
 @Entity({ name: "Users" })
 @Unique(["username"])
-export class UserEntity extends BaseEntity {
+export class UserEntity extends BaseEntity implements UserInterface {
   @PrimaryGeneratedColumn()
   id: number;
 
