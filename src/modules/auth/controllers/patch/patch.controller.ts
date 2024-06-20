@@ -21,16 +21,22 @@ import { UserDto } from "../../dtos/user.dto";
 export class AuthPatchController {
   constructor(private authService: AuthService) { }
 
-  @Patch("/edit-profile/:username")
+  @Patch("/edit-current-profile")
   @UseGuards(AuthGuard())
+  editCurrentProfile(
+    @GetUser() user: UserEntity,
+    @Body(ValidationPipe) userDto: UserDto
+  ) {
+    return this.authService.editProfile(user.username, userDto);
+  }
+
+  @Patch("/edit-profile/:username")
+  @UseGuards(AuthGuard(), IsModeratorGuard)
   editProfile(
     @GetUser() user: UserEntity,
     @Param("username") username: string,
     @Body(ValidationPipe) userDto: UserDto
   ) {
-    console.log("userDto: ", userDto);
-    return user.role > 1
-      ? this.authService.editProfile(username, userDto)
-      : this.authService.editProfile(user.username, userDto);
+    return this.authService.editProfile(username, userDto);
   }
 }

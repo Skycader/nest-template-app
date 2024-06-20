@@ -12,10 +12,9 @@ import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
 import { UserSearchConfigInterface } from "../models/user-search.config";
 import { QueryErrorInterface } from "../models/query-fail.model";
 import { UserRolesEnum } from "../models/roles.enum";
-import { UserEnum } from "../models/user.enum";
-import { UserInterface } from "../models/user.model";
 import { UserDto } from "../dtos/user.dto";
 import { PublicUserFields } from "../models/user.fields";
+
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
   constructor(

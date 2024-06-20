@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
-import * as Captcha from 'node-captcha-generator';
+import { Injectable } from "@nestjs/common";
+import * as bcrypt from "bcryptjs";
+import * as Captcha from "node-captcha-generator";
+import { secret } from "src/config/jwt.config";
 @Injectable()
 export class CaptchaService {
-  getCaptcha(): any {
-    const c = new Captcha({
+  getCaptcha() {
+    const captcha: Captcha = new Captcha({
       length: 4, // number length
       size: {
         // output size
@@ -14,14 +15,18 @@ export class CaptchaService {
     });
 
     // get base64 image as string
-    let time = Date.now() + 300000; //5 minutes
+    let duration = Date.now() + 300000; //5 minutes
     let info = {};
-    c.toBase64(function(err, base64) {
+
+    captcha.toBase64(function(err: Error, base64: string) {
       info = {
         //value: c.value + '.' + time + '.',
-        expiresIn: time,
+        expiresIn: duration,
         hashed: btoa(
-          bcrypt.hashSync(c.value + time + 'secret', bcrypt.genSaltSync()),
+          bcrypt.hashSync(
+            captcha.value + duration + secret,
+            bcrypt.genSaltSync()
+          )
         ),
         base: base64,
       };
@@ -30,15 +35,14 @@ export class CaptchaService {
     return info;
   }
 
-  async verifyCaptcha(token: string) {
+  async verifyCaptcha(token: string): Promise<boolean> {
     try {
-      const data = token.split('.');
+      const data = token.split(".");
       let code = data[0];
       let expiresIn = Number(data[1]);
       let hashed = data[2];
       if (Number(expiresIn) < Date.now()) return false;
-
-      return await bcrypt.compare(code + expiresIn + 'secret', atob(hashed));
+      return await bcrypt.compare(code + expiresIn + secret, atob(hashed));
     } catch (e) {
       console.log(e);
       return false;

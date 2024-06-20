@@ -4,8 +4,6 @@ import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
 import { UserRepository } from "../repositories/user.repository";
 import { JwtPayloadInterface } from "../models/jwt-payload.model";
 import { UserSearchConfigInterface } from "../models/user-search.config";
-import { UserInterface } from "../models/user.model";
-import { Observable, of } from "rxjs";
 import { UserDto } from "../dtos/user.dto";
 
 @Injectable()
@@ -17,17 +15,17 @@ export class AuthService {
     this.initAuthTable();
   }
 
-  async initAuthTable() {
+  async initAuthTable(): Promise<number> {
     let admin = await this.getUser("admin");
 
-    if (admin) return of(0);
+    if (admin) return 0;
 
     this.signUp({
       username: "admin",
       password: "admin",
     });
 
-    return of(1);
+    return 1;
   }
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<number> {
