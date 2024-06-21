@@ -6,11 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "start:dev": "nest start --watch",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start": "yarn ntl -s 20 -A --exclude start start:debug start:prod lint test test:watch test:cov test:debug test:e2e typeorm2 migration2:generate migration2:run migration2:revert migration2:create format schema2:sync",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -25,6 +25,12 @@
     "migration2:revert": "typeorm -- migration:revert",
     "schema2:sync": "typeorm -- schema:sync",
     "migration2:create": "typeorm -- migration:create migrations"
+  },
+  "ntl": {
+    "descriptions": {
+      "start:dev": "start dev server on http://localhost:3000",
+      "build": "build dist"
+    }
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
@@ -44,6 +50,7 @@
     "md5": "^2.3.0",
     "node-captcha-generator": "^0.0.1",
     "nodemailer": "^6.9.3",
+    "ntl": "^5.1.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.0",
