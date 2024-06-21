@@ -3,33 +3,34 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import * as bcrypt from "bcryptjs";
-import { FindOptionsWhere, Like, Repository, TypeORMError } from "typeorm";
-import { UserEntity } from "../entities/user.entity";
-import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
-import { UserSearchConfigInterface } from "../models/user-search.config";
-import { QueryErrorInterface } from "../models/query-fail.model";
-import { UserRolesEnum } from "../models/roles.enum";
-import { UserDto } from "../dtos/user.dto";
-import { PublicUserFields } from "../models/user.fields";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcryptjs';
+import { FindOptionsWhere, Like, Repository, TypeORMError } from 'typeorm';
+import { UserEntity } from '../entities/user.entity';
+import { AuthCredentialsDto } from '../dtos/auth-credentials.dto';
+import { UserSearchConfigInterface } from '../models/user-search.config';
+import { QueryErrorInterface } from '../models/query-fail.model';
+import { UserRolesEnum } from '../models/roles.enum';
+import { UserDto } from '../dtos/user.dto';
+import { PublicUserFields } from '../models/user.fields';
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
   constructor(
     @InjectRepository(UserEntity)
-    private repository: Repository<UserEntity>
+    private repository: Repository<UserEntity>,
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  public async getUser(username: string): Promise<string> {
+  public async getUser(username: string): Promise<UserEntity> {
     const user = await this.findOne({
+      select: PublicUserFields,
       where: { username },
     });
 
-    if (user) return user.username;
+    if (user) return user;
     throw new NotFoundException(404);
   }
 
@@ -42,7 +43,7 @@ export class UserRepository extends Repository<UserEntity> {
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
 
-    if (user.username === "admin") user.role = UserRolesEnum.administrator;
+    if (user.username === 'admin') user.role = UserRolesEnum.administrator;
 
     try {
       await user.save();
@@ -54,7 +55,7 @@ export class UserRepository extends Repository<UserEntity> {
   }
 
   async validateUserPassword(
-    authCredentialsDto: AuthCredentialsDto
+    authCredentialsDto: AuthCredentialsDto,
   ): Promise<string> {
     const { username, password } = authCredentialsDto;
     const user = await this.findOne({
@@ -74,7 +75,7 @@ export class UserRepository extends Repository<UserEntity> {
 
   async searchUsers(config: UserSearchConfigInterface = {}) {
     const page = config.page ? config.page : 1;
-    const searchConfig: FindOptionsWhere<UserEntity> = { username: Like("%%") };
+    const searchConfig: FindOptionsWhere<UserEntity> = { username: Like('%%') };
 
     if (config.username) searchConfig.username = Like(`%${config.username}%`);
     if (config.role) searchConfig.role = config.role;

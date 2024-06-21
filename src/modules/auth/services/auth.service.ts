@@ -1,28 +1,29 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { AuthCredentialsDto } from "../dtos/auth-credentials.dto";
-import { UserRepository } from "../repositories/user.repository";
-import { JwtPayloadInterface } from "../models/jwt-payload.model";
-import { UserSearchConfigInterface } from "../models/user-search.config";
-import { UserDto } from "../dtos/user.dto";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { AuthCredentialsDto } from '../dtos/auth-credentials.dto';
+import { UserRepository } from '../repositories/user.repository';
+import { JwtPayloadInterface } from '../models/jwt-payload.model';
+import { UserSearchConfigInterface } from '../models/user-search.config';
+import { UserDto } from '../dtos/user.dto';
+import { UserEntity } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
   ) {
     this.initAuthTable();
   }
 
   async initAuthTable(): Promise<number> {
-    let admin = await this.getUser("admin");
+    let admin = await this.getUser('admin');
 
     if (admin) return 0;
 
     this.signUp({
-      username: "admin",
-      password: "admin",
+      username: 'admin',
+      password: 'admin',
     });
 
     return 1;
@@ -36,23 +37,26 @@ export class AuthService {
     return this.userRepository.searchUsers(config);
   }
 
-  async getUser(username: string = "") {
+  async getUser(username: string = ''): Promise<UserEntity> {
     return this.userRepository.getUser(username);
   }
 
   async signInWithPassword(
-    authCredentialsDto: AuthCredentialsDto
-  ): Promise<{ accessToken: string }> {
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ user: UserEntity; accessToken: string }> {
     const username = await this.userRepository.validateUserPassword(
-      authCredentialsDto
+      authCredentialsDto,
     );
     if (!username) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload: JwtPayloadInterface = { username };
     const accessToken = await this.jwtService.signAsync(payload);
-    return { accessToken };
+
+    const user = await this.getUser(username);
+
+    return { user, accessToken };
   }
 
   async editProfile(username: string, userDto: UserDto) {
