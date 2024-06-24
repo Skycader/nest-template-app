@@ -13,7 +13,6 @@ import { ApiProperty } from '@nestjs/swagger';
 @Entity({ name: 'Users' })
 @Unique(['username'])
 export class UserEntity extends BaseEntity implements UserInterface {
-  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -53,11 +52,9 @@ export class UserEntity extends BaseEntity implements UserInterface {
   @Column({ default: '' })
   information: string;
 
-  @ApiProperty()
   @Column()
   password: string;
 
-  @ApiProperty()
   @Column()
   salt: string;
 
