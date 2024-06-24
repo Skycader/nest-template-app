@@ -84,7 +84,7 @@ export class UserRepository extends Repository<UserEntity> {
     if (config.midname) searchConfig.midname = Like(`%${config.midname}%`);
     if (config.telephone) searchConfig.username = Like(`%${config.telephone}%`);
 
-    let pages = await this.count({
+    let totalUsers = await this.count({
       where: [searchConfig],
     });
 
@@ -97,7 +97,7 @@ export class UserRepository extends Repository<UserEntity> {
 
     return {
       users,
-      pages,
+      totalUsers,
     };
   }
 
