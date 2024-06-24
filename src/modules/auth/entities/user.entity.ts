@@ -4,48 +4,60 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Unique,
-} from "typeorm";
-import * as bcrypt from "bcryptjs";
-import { UserRolesEnum } from "../models/roles.enum";
-import { UserInterface } from "../models/user.model";
+} from 'typeorm';
+import * as bcrypt from 'bcryptjs';
+import { UserRolesEnum } from '../models/roles.enum';
+import { UserInterface } from '../models/user.model';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity({ name: "Users" })
-@Unique(["username"])
+@Entity({ name: 'Users' })
+@Unique(['username'])
 export class UserEntity extends BaseEntity implements UserInterface {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty()
   @Column({ unique: true })
   username: string;
 
+  @ApiProperty()
   @Column({ default: 1 })
   role: UserRolesEnum;
 
-  @Column({ default: "" })
+  @ApiProperty()
+  @Column({ default: '' })
   name: string;
 
-  @Column({ default: "" })
+  @ApiProperty()
+  @Column({ default: '' })
   surname: string;
 
-  @Column({ default: "" })
+  @ApiProperty()
+  @Column({ default: '' })
   midname: string;
 
+  @ApiProperty()
   @Column({ default: 0 })
   birthdate: number; /* unix timestamp */
 
-  @Column({ default: "" })
+  @ApiProperty()
+  @Column({ default: '' })
   telephone: string;
 
   /**
    * Additional info
    * Type: JSON
    */
-  @Column({ default: "" })
+  @ApiProperty()
+  @Column({ default: '' })
   information: string;
 
+  @ApiProperty()
   @Column()
   password: string;
 
+  @ApiProperty()
   @Column()
   salt: string;
 
