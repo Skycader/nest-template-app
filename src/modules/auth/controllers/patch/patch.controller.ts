@@ -5,38 +5,53 @@ import {
   Patch,
   UseGuards,
   ValidationPipe,
-} from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { AuthService } from "../../services/auth.service";
-import { IsModeratorGuard } from "../../guards/is-moderator.guard";
-import { UserEntity } from "../../entities/user.entity";
-import { GetUser } from "../../decorators/get-user.decorator";
-import { UserDto } from "../../dtos/user.dto";
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from '../../services/auth.service';
+import { IsModeratorGuard } from '../../guards/is-moderator.guard';
+import { UserEntity } from '../../entities/user.entity';
+import { GetUser } from '../../decorators/get-user.decorator';
+import { UserDto } from '../../dtos/user.dto';
+import { AuthCredentialsDto } from '../../dtos/auth-credentials.dto';
+import { PasswordResetDto } from '../../dtos/password-reset.dto';
 
 /** @TODO
  * Remove fucking anys
  *
  */
-@Controller("auth")
+@Controller('auth')
 export class AuthPatchController {
   constructor(private authService: AuthService) { }
 
-  @Patch("/edit-current-profile")
+  @Patch('/edit-current-profile')
   @UseGuards(AuthGuard())
   editCurrentProfile(
     @GetUser() user: UserEntity,
-    @Body(ValidationPipe) userDto: UserDto
+    @Body(ValidationPipe) userDto: UserDto,
   ) {
     return this.authService.editProfile(user.username, userDto);
   }
 
-  @Patch("/edit-profile/:username")
+  @Patch('/edit-profile/:username')
   @UseGuards(AuthGuard(), IsModeratorGuard)
   editProfile(
     @GetUser() user: UserEntity,
-    @Param("username") username: string,
-    @Body(ValidationPipe) userDto: UserDto
+    @Param('username') username: string,
+    @Body(ValidationPipe) userDto: UserDto,
   ) {
     return this.authService.editProfile(username, userDto);
+  }
+
+  @Patch('/edit-current-password')
+  @UseGuards(AuthGuard())
+  public async editCurrentPassword(
+    @GetUser() user: UserEntity,
+    @Body(ValidationPipe) password: PasswordResetDto,
+  ) {
+    const status = await this.authService.changePassword(
+      user.username,
+      password,
+    );
+    return { status };
   }
 }

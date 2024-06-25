@@ -6,6 +6,8 @@ import { JwtPayloadInterface } from '../models/jwt-payload.model';
 import { UserSearchConfigInterface } from '../models/user-search.config';
 import { UserDto } from '../dtos/user.dto';
 import { UserEntity } from '../entities/user.entity';
+import { StatusCodeEnum } from '../models/status.enum';
+import { PasswordResetDto } from '../dtos/password-reset.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,8 +31,17 @@ export class AuthService {
     return 1;
   }
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<number> {
+  async signUp(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<StatusCodeEnum> {
     return this.userRepository.signUp(authCredentialsDto);
+  }
+
+  async changePassword(
+    username: string,
+    password: PasswordResetDto,
+  ): Promise<StatusCodeEnum> {
+    return this.userRepository.changePassword(username, password);
   }
 
   async searchUsers(config: UserSearchConfigInterface = {}) {

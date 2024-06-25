@@ -14,6 +14,8 @@ import { QueryErrorInterface } from '../models/query-fail.model';
 import { UserRolesEnum } from '../models/roles.enum';
 import { UserDto } from '../dtos/user.dto';
 import { PublicUserFields } from '../models/user.fields';
+import { StatusCodeEnum } from '../models/status.enum';
+import { PasswordResetDto } from '../dtos/password-reset.dto';
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
@@ -34,7 +36,18 @@ export class UserRepository extends Repository<UserEntity> {
     throw new NotFoundException(404);
   }
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<number> {
+  public async getFullUser(username: string): Promise<UserEntity> {
+    const user = await this.findOne({
+      where: { username },
+    });
+
+    if (user) return user;
+    throw new NotFoundException(404);
+  }
+
+  async signUp(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<StatusCodeEnum> {
     const { username, password } = authCredentialsDto;
 
     const user = new UserEntity();
@@ -47,10 +60,30 @@ export class UserRepository extends Repository<UserEntity> {
 
     try {
       await user.save();
-      return 0;
+      return StatusCodeEnum.Success;
     } catch (e) {
       this.errorHandler(e);
-      return 1;
+      return StatusCodeEnum.Failure;
+    }
+  }
+
+  public async changePassword(
+    username: string,
+    authCredentialsDto: PasswordResetDto,
+  ): Promise<StatusCodeEnum> {
+    const { password } = authCredentialsDto;
+
+    const user = await this.getFullUser(username);
+
+    user.salt = await bcrypt.genSalt();
+    user.password = await this.hashPassword(password, user.salt);
+
+    try {
+      await user.save();
+      return StatusCodeEnum.Success;
+    } catch (e) {
+      this.errorHandler(e);
+      return StatusCodeEnum.Failure;
     }
   }
 
