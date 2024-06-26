@@ -56,7 +56,7 @@ export class UserRepository extends Repository<UserEntity> {
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
 
-    if (user.username === 'admin') user.role = UserRolesEnum.administrator;
+    if (user.username === 'admin') user.role = UserRolesEnum.Administrator;
 
     try {
       await user.save();
