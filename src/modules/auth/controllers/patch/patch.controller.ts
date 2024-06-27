@@ -54,4 +54,14 @@ export class AuthPatchController {
     );
     return { status };
   }
+
+  @Patch('/edit-password/:username')
+  @UseGuards(AuthGuard())
+  public async editPassword(
+    @Param('username') username: string,
+    @Body(ValidationPipe) password: PasswordResetDto,
+  ) {
+    const status = await this.authService.changePassword(username, password);
+    return { status };
+  }
 }
