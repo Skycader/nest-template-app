@@ -19,7 +19,6 @@ export class AuthGetController {
   @Get('/user/:username')
   @UseGuards(AuthGuard(), IsModeratorGuard)
   getUser(@Param('username') username: string) {
-    console.log(username);
     return this.authService.getUser(username);
   }
 

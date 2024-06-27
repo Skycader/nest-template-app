@@ -14,6 +14,7 @@ import { GetUser } from '../../decorators/get-user.decorator';
 import { UserDto } from '../../dtos/user.dto';
 import { AuthCredentialsDto } from '../../dtos/auth-credentials.dto';
 import { PasswordResetDto } from '../../dtos/password-reset.dto';
+import { IsAdminGuard } from '../../guards/is-admin.guard';
 
 /** @TODO
  * Remove fucking anys
@@ -56,7 +57,7 @@ export class AuthPatchController {
   }
 
   @Patch('/edit-password/:username')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), IsAdminGuard)
   public async editPassword(
     @Param('username') username: string,
     @Body(ValidationPipe) password: PasswordResetDto,
