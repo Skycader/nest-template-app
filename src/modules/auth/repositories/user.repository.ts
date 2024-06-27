@@ -153,6 +153,18 @@ export class UserRepository extends Repository<UserEntity> {
     return user;
   }
 
+  async updateRole(username: string, role: UserRolesEnum) {
+    let user = await this.findOne({
+      select: PublicUserFields,
+      where: { username: username },
+    });
+
+    user.role = role;
+
+    await user.save();
+    return user;
+  }
+
   public errorHandler(error: QueryErrorInterface) {
     switch (error.code) {
       case 23505:

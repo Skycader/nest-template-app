@@ -8,6 +8,7 @@ import { UserDto } from '../dtos/user.dto';
 import { UserEntity } from '../entities/user.entity';
 import { StatusCodeEnum } from '../models/status.enum';
 import { PasswordResetDto } from '../dtos/password-reset.dto';
+import { UserRolesEnum } from '../models/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -50,6 +51,10 @@ export class AuthService {
 
   async getUser(username: string = ''): Promise<UserEntity> {
     return this.userRepository.getUser(username);
+  }
+
+  async updateRole(username: string, role: UserRolesEnum): Promise<UserEntity> {
+    return this.userRepository.updateRole(username, role);
   }
 
   async signInWithPassword(

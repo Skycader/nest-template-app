@@ -12,14 +12,9 @@ import { IsModeratorGuard } from '../../guards/is-moderator.guard';
 import { UserEntity } from '../../entities/user.entity';
 import { GetUser } from '../../decorators/get-user.decorator';
 import { UserDto } from '../../dtos/user.dto';
-import { AuthCredentialsDto } from '../../dtos/auth-credentials.dto';
 import { PasswordResetDto } from '../../dtos/password-reset.dto';
 import { IsAdminGuard } from '../../guards/is-admin.guard';
 
-/** @TODO
- * Remove fucking anys
- *
- */
 @Controller('auth')
 export class AuthPatchController {
   constructor(private authService: AuthService) { }
